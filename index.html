@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Werkuren Overzicht</title>
+    <title>Betaalde uren</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -247,7 +247,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Werkuren Overzicht</h1>
+        <h1>Betaalde uren</h1>
 
         <div class="card">
             <span class="field-label">ICS URL</span>
@@ -444,7 +444,7 @@
                 if (isToday) tr.classList.add('today');
 
                 const hoursCell = ms > 0
-                    ? `<td class="td-hours-val">${msToHours(ms)}</td>`
+                    ? `<td class="td-hours-val">${(ms / 3600000).toFixed(2).replace('.', ',')}</td>`
                     : `<td class="td-hours-zero">—</td>`;
 
                 tr.innerHTML = `
