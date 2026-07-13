@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Werkuren Overzicht</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f2f5;
+            color: #111827;
+            min-height: 100vh;
+            padding: 32px 16px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #111827;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 14px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+        }
+
+        .field-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 8px;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        input[type="url"] {
+            flex: 1;
+            padding: 10px 14px;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #111827;
+            outline: none;
+            transition: border-color 0.15s;
+            min-width: 0;
+        }
+
+        input[type="url"]:focus { border-color: #4f46e5; }
+
+        .btn {
+            padding: 10px 18px;
+            background: #4f46e5;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s;
+            white-space: nowrap;
+        }
+
+        .btn:hover { background: #4338ca; }
+        .btn:disabled { background: #9ca3af; cursor: not-allowed; }
+
+        .btn-ghost {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .btn-ghost:hover { background: #e5e7eb; }
+
+        details { margin-top: 14px; }
+
+        summary {
+            font-size: 13px;
+            color: #4f46e5;
+            cursor: pointer;
+            user-select: none;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        summary::before { content: '▸'; font-size: 11px; }
+        details[open] summary::before { content: '▾'; }
+        summary:hover { text-decoration: underline; }
+
+        .paste-area {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 110px;
+            padding: 10px 12px;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 12px;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            resize: vertical;
+            outline: none;
+            color: #374151;
+        }
+
+        textarea:focus { border-color: #4f46e5; }
+
+        .alert {
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 13.5px;
+            line-height: 1.5;
+            margin-bottom: 14px;
+        }
+
+        .alert-error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #b91c1c;
+        }
+
+        .alert-info {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #1d4ed8;
+        }
+
+        .week-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+        }
+
+        .btn-nav {
+            background: none;
+            border: 1.5px solid #e5e7eb;
+            color: #374151;
+            border-radius: 8px;
+            padding: 7px 14px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: background 0.1s, border-color 0.1s;
+        }
+
+        .btn-nav:hover { background: #f3f4f6; border-color: #d1d5db; }
+
+        .week-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #111827;
+            text-align: center;
+        }
+
+        .week-label small {
+            display: block;
+            font-size: 11px;
+            font-weight: 400;
+            color: #9ca3af;
+            margin-top: 2px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead th {
+            font-size: 11px;
+            font-weight: 700;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            padding-bottom: 10px;
+            text-align: left;
+        }
+
+        thead th:last-child { text-align: right; }
+
+        tbody tr td {
+            padding: 11px 0;
+            border-top: 1px solid #f3f4f6;
+            font-size: 14.5px;
+            vertical-align: middle;
+        }
+
+        tbody tr:last-child td { border-bottom: 1px solid #f3f4f6; }
+
+        .today td { background: #f5f3ff; }
+
+        td:last-child { text-align: right; }
+
+        .td-dag { font-weight: 600; color: #111827; }
+
+        .today .td-dag::after {
+            content: 'VANDAAG';
+            display: inline-block;
+            background: #4f46e5;
+            color: #fff;
+            font-size: 9px;
+            font-weight: 700;
+            padding: 2px 5px;
+            border-radius: 4px;
+            margin-left: 7px;
+            letter-spacing: 0.5px;
+            vertical-align: middle;
+        }
+
+        .td-date { color: #9ca3af; font-size: 13px; }
+
+        .td-hours-val { font-weight: 700; color: #4f46e5; font-size: 15px; }
+        .td-hours-zero { color: #d1d5db; font-size: 14px; }
+
+        tfoot tr td {
+            padding-top: 14px;
+            font-weight: 700;
+            font-size: 15px;
+            color: #111827;
+        }
+
+        tfoot .td-total-val {
+            font-size: 17px;
+            color: #111827;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Werkuren Overzicht</h1>
+
+        <div class="card">
+            <span class="field-label">ICS URL</span>
+            <div class="input-row">
+                <input type="url" id="icsUrl" placeholder="https://...">
+                <button class="btn" id="loadBtn" onclick="loadFromUrl()">Laden</button>
+                <button class="btn btn-ghost" id="clearBtn" onclick="clearSaved()" style="display:none" title="Opgeslagen URL verwijderen">&#x2715;</button>
+            </div>
+
+            <details id="pasteSection">
+                <summary>Of plak ICS inhoud direct</summary>
+                <div class="paste-area">
+                    <textarea id="icsText" placeholder="Plak hier de volledige inhoud van het .ics bestand..."></textarea>
+                    <button class="btn btn-ghost" style="align-self:flex-start" onclick="loadFromText()">Verwerken</button>
+                </div>
+            </details>
+        </div>
+
+        <div id="alertBox" style="display:none"></div>
+
+        <div class="card" id="resultsCard" style="display:none">
+            <div class="week-nav">
+                <button class="btn-nav" onclick="changeWeek(-1)">&#8592;</button>
+                <div class="week-label">
+                    <span id="weekRange"></span>
+                    <small id="weekYear"></small>
+                </div>
+                <button class="btn-nav" onclick="changeWeek(1)">&#8594;</button>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Dag</th>
+                        <th>Datum</th>
+                        <th>Uren</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody"></tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="2" style="color:#6b7280;font-size:13px;font-weight:600">Totaal week</td>
+                        <td class="td-total-val" id="weekTotal"></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const EXCLUDED = new Set(['Lunch', 'Afschalen_FO', 'Ziek', 'Te laat']);
+        const DAYS = ['Zondag', 'Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag'];
+        const MONTHS = ['jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
+
+        let events = [];
+        let weekStart = mondayOf(new Date());
+
+        // --- Datum hulpfuncties ---
+
+        function amsterdamDate(d) {
+            return new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Amsterdam' }).format(d);
+        }
+
+        function mondayOf(d) {
+            const str = amsterdamDate(d);
+            const [y, m, day] = str.split('-').map(Number);
+            const dt = new Date(Date.UTC(y, m - 1, day));
+            const dow = dt.getUTCDay();
+            const back = dow === 0 ? 6 : dow - 1;
+            dt.setUTCDate(dt.getUTCDate() - back);
+            return dt;
+        }
+
+        function shiftDays(d, n) {
+            const r = new Date(d);
+            r.setUTCDate(r.getUTCDate() + n);
+            return r;
+        }
+
+        function dateKey(d) {
+            const y = d.getUTCFullYear();
+            const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+            const day = String(d.getUTCDate()).padStart(2, '0');
+            return `${y}-${m}-${day}`;
+        }
+
+        function displayDate(d) {
+            return `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]}`;
+        }
+
+        // --- ICS Parsing ---
+
+        function unfold(text) {
+            return text.replace(/\r\n[ \t]/g, '').replace(/\n[ \t]/g, '');
+        }
+
+        function field(block, name) {
+            const re = new RegExp(`(?:^|\\n)${name}(?:;[^:\\n]*)?:([^\\n]+)`, 'i');
+            const m = block.match(re);
+            return m ? m[1].trim() : null;
+        }
+
+        function parseDate(str) {
+            if (!str) return null;
+
+            // UTC formaat: 20260713T080000Z
+            if (/^\d{8}T\d{6}Z$/.test(str)) {
+                return new Date(
+                    `${str.slice(0,4)}-${str.slice(4,6)}-${str.slice(6,8)}` +
+                    `T${str.slice(9,11)}:${str.slice(11,13)}:${str.slice(13,15)}Z`
+                );
+            }
+
+            // Lokaal formaat zonder Z: 20260713T100000 (Amsterdam tijd)
+            if (/^\d{8}T\d{6}$/.test(str)) {
+                const month = parseInt(str.slice(4, 6));
+                // CEST (UTC+2) van april t/m oktober, anders CET (UTC+1)
+                const offset = (month >= 4 && month <= 10) ? 2 : 1;
+                const naive = new Date(
+                    `${str.slice(0,4)}-${str.slice(4,6)}-${str.slice(6,8)}` +
+                    `T${str.slice(9,11)}:${str.slice(11,13)}:${str.slice(13,15)}Z`
+                );
+                return new Date(naive.getTime() - offset * 3600000);
+            }
+
+            return null;
+        }
+
+        function parseICS(text) {
+            const unfolded = unfold(text);
+            const result = [];
+            const blocks = unfolded.split(/BEGIN:VEVENT/i);
+
+            for (let i = 1; i < blocks.length; i++) {
+                const block = blocks[i];
+                const summary = field(block, 'SUMMARY');
+                if (!summary || EXCLUDED.has(summary.trim())) continue;
+
+                const start = parseDate(field(block, 'DTSTART'));
+                const end   = parseDate(field(block, 'DTEND'));
+
+                if (!start || !end || end <= start) continue;
+
+                result.push({
+                    summary: summary.trim(),
+                    dateKey: amsterdamDate(start),
+                    durationMs: end - start
+                });
+            }
+
+            return result;
+        }
+
+        // --- Weergave ---
+
+        function msToHours(ms) {
+            return (ms / 3600000).toFixed(2) + ' u';
+        }
+
+        function renderWeek() {
+            const todayKey = amsterdamDate(new Date());
+            const sunday = shiftDays(weekStart, 6);
+
+            document.getElementById('weekRange').textContent =
+                `${displayDate(weekStart)} – ${displayDate(sunday)}`;
+            document.getElementById('weekYear').textContent =
+                sunday.getUTCFullYear();
+
+            // Bouw dagtotalen op voor deze week
+            const totals = {};
+            for (let i = 0; i < 7; i++) {
+                totals[dateKey(shiftDays(weekStart, i))] = 0;
+            }
+            for (const ev of events) {
+                if (ev.dateKey in totals) {
+                    totals[ev.dateKey] += ev.durationMs;
+                }
+            }
+
+            const tbody = document.getElementById('tbody');
+            tbody.innerHTML = '';
+            let weekMs = 0;
+
+            for (let i = 0; i < 7; i++) {
+                const d = shiftDays(weekStart, i);
+                const key = dateKey(d);
+                const ms = totals[key];
+                weekMs += ms;
+
+                const isToday = key === todayKey;
+                const dow = d.getUTCDay();
+
+                const tr = document.createElement('tr');
+                if (isToday) tr.classList.add('today');
+
+                const hoursCell = ms > 0
+                    ? `<td class="td-hours-val">${msToHours(ms)}</td>`
+                    : `<td class="td-hours-zero">—</td>`;
+
+                tr.innerHTML = `
+                    <td class="td-dag">${DAYS[dow]}</td>
+                    <td class="td-date">${displayDate(d)}</td>
+                    ${hoursCell}
+                `;
+                tbody.appendChild(tr);
+            }
+
+            document.getElementById('weekTotal').textContent = msToHours(weekMs);
+            document.getElementById('resultsCard').style.display = 'block';
+        }
+
+        function changeWeek(dir) {
+            weekStart = shiftDays(weekStart, dir * 7);
+            renderWeek();
+        }
+
+        // --- Laden ---
+
+        function showAlert(html, type = 'error') {
+            const el = document.getElementById('alertBox');
+            el.className = `alert alert-${type}`;
+            el.innerHTML = html;
+            el.style.display = 'block';
+        }
+
+        function hideAlert() {
+            document.getElementById('alertBox').style.display = 'none';
+        }
+
+        async function loadFromUrl() {
+            const url = document.getElementById('icsUrl').value.trim();
+            if (!url) { showAlert('Vul een ICS URL in.'); return; }
+
+            hideAlert();
+            const btn = document.getElementById('loadBtn');
+            btn.disabled = true;
+            btn.textContent = 'Laden…';
+
+            try {
+                const res = await fetch(url);
+                if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+                const text = await res.text();
+                localStorage.setItem('werkuren_ics_url', url);
+                document.getElementById('clearBtn').style.display = '';
+                process(text);
+            } catch (err) {
+                const isCors = err instanceof TypeError;
+                if (isCors) {
+                    showAlert(
+                        '<strong>URL kon niet worden geladen vanuit de browser.</strong><br>' +
+                        'Dit komt door een CORS-beperking van de server. Gebruik de optie hieronder:<br><br>' +
+                        '1. Open de URL in een nieuw tabblad<br>' +
+                        '2. Kopieer alle tekst op de pagina (Cmd+A → Cmd+C)<br>' +
+                        '3. Plak de inhoud in het tekstveld "Of plak ICS inhoud direct"'
+                    );
+                    document.getElementById('pasteSection').open = true;
+                } else {
+                    showAlert(`Fout bij laden: ${err.message}`);
+                }
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Laden';
+            }
+        }
+
+        function loadFromText() {
+            const text = document.getElementById('icsText').value.trim();
+            if (!text) { showAlert('Plak eerst ICS inhoud in het tekstveld.'); return; }
+            hideAlert();
+            process(text);
+        }
+
+        function process(text) {
+            if (!text.includes('BEGIN:VCALENDAR')) {
+                showAlert('Dit lijkt geen geldig ICS bestand te zijn.');
+                return;
+            }
+            events = parseICS(text);
+            if (events.length === 0) {
+                showAlert('Geen werkuren gevonden in dit ICS bestand. Controleer of de events de juiste namen hebben.');
+                return;
+            }
+            weekStart = mondayOf(new Date());
+            renderWeek();
+        }
+
+        function clearSaved() {
+            localStorage.removeItem('werkuren_ics_url');
+            document.getElementById('icsUrl').value = '';
+            document.getElementById('clearBtn').style.display = 'none';
+            document.getElementById('resultsCard').style.display = 'none';
+            hideAlert();
+            events = [];
+        }
+
+        window.addEventListener('load', () => {
+            const saved = localStorage.getItem('werkuren_ics_url');
+            if (saved) {
+                document.getElementById('icsUrl').value = saved;
+                document.getElementById('clearBtn').style.display = '';
+                loadFromUrl();
+            }
+        });
+    </script>
+</body>
+</html>
