@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Betaalde uren</title>
+    <title>Mijn Rooster</title>
+    <link rel="icon" href="icon.png" type="image/png">
     <link rel="apple-touch-icon" href="icon.png">
-    <meta name="apple-mobile-web-app-title" content="Betaalde uren">
+    <meta name="apple-mobile-web-app-title" content="Mijn Rooster">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -90,45 +91,6 @@
 
         .btn-ghost:hover { background: #e5e7eb; }
 
-        details { margin-top: 14px; }
-
-        summary {
-            font-size: 13px;
-            color: #4f46e5;
-            cursor: pointer;
-            user-select: none;
-            list-style: none;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        summary::before { content: '▸'; font-size: 11px; }
-        details[open] summary::before { content: '▾'; }
-        summary:hover { text-decoration: underline; }
-
-        .paste-area {
-            margin-top: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        textarea {
-            width: 100%;
-            height: 110px;
-            padding: 10px 12px;
-            border: 1.5px solid #e5e7eb;
-            border-radius: 8px;
-            font-size: 12px;
-            font-family: 'SF Mono', 'Fira Code', monospace;
-            resize: vertical;
-            outline: none;
-            color: #374151;
-        }
-
-        textarea:focus { border-color: #4f46e5; }
-
         .alert {
             border-radius: 8px;
             padding: 12px 16px;
@@ -143,12 +105,7 @@
             color: #b91c1c;
         }
 
-        .alert-info {
-            background: #eff6ff;
-            border: 1px solid #bfdbfe;
-            color: #1d4ed8;
-        }
-
+        /* Week navigatie */
         .week-nav {
             display: flex;
             align-items: center;
@@ -169,6 +126,7 @@
 
         .btn-nav:hover { background: #f3f4f6; border-color: #d1d5db; }
 
+
         .week-label {
             font-size: 14px;
             font-weight: 600;
@@ -184,9 +142,11 @@
             margin-top: 2px;
         }
 
+        /* Tabel */
         table {
             width: 100%;
             border-collapse: collapse;
+            table-layout: fixed;
         }
 
         thead th {
@@ -199,25 +159,48 @@
             text-align: left;
         }
 
-        thead th:last-child { text-align: right; }
+        thead th:nth-child(1) { width: 45%; }
+        thead th:nth-child(2) { width: 20%; text-align: center; }
+        thead th:nth-child(3) { width: 35%; text-align: right; }
 
-        tbody tr td {
+        /* Dag rijen */
+        .day-row td {
             padding: 11px 0;
             border-top: 1px solid #f3f4f6;
             font-size: 14.5px;
             vertical-align: middle;
+            transition: background 0.1s;
         }
 
-        tbody tr:last-child td { border-bottom: 1px solid #f3f4f6; }
+        .day-row {
+            cursor: pointer;
+        }
 
-        .today td { background: #f5f3ff; }
+        .day-row:hover td { background: #f3f4f6; }
+        .day-row.today td { background: #f5f3ff; }
+        .day-row.today:hover td { background: #ede9fe; }
 
-        td:last-child { text-align: right; }
+        .td-dag {
+            font-weight: 600;
+            color: #111827;
+            white-space: nowrap;
+        }
 
-        .td-dag { font-weight: 600; color: #111827; }
+        .chevron {
+            display: inline-block;
+            color: #d1d5db;
+            font-size: 13px;
+            margin-right: 6px;
+            transition: transform 0.2s, color 0.2s;
+            font-style: normal;
+        }
 
-        .today .td-dag::after {
-            content: 'VANDAAG';
+        .chevron.open {
+            transform: rotate(90deg);
+            color: #4f46e5;
+        }
+
+        .today-badge {
             display: inline-block;
             background: #4f46e5;
             color: #fff;
@@ -230,13 +213,115 @@
             vertical-align: middle;
         }
 
-        .td-date { color: #9ca3af; font-size: 13px; }
+        .td-date { color: #9ca3af; font-size: 13px; text-align: center; }
+
+        /* Uren cel */
+        .hours-cell {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 6px;
+        }
 
         .td-hours-val { font-weight: 700; color: #4f46e5; font-size: 15px; }
         .td-hours-zero { color: #d1d5db; font-size: 14px; }
 
+        .copy-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #d1d5db;
+            padding: 2px 3px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.15s, color 0.15s;
+            flex-shrink: 0;
+        }
+
+        .day-row:hover .copy-btn { opacity: 1; }
+        .copy-btn:hover { color: #4f46e5; }
+        .copy-btn.copied { color: #10b981; opacity: 1; }
+
+        /* Accordeon rijen */
+        .accordion-row td {
+            padding: 0 !important;
+            border-top: none !important;
+        }
+
+        .accordion-content {
+            overflow: hidden;
+            max-height: 0;
+            transition: max-height 0.25s ease;
+        }
+
+        .accordion-content.open {
+            max-height: 800px;
+        }
+
+        .accordion-inner {
+            padding: 4px 0 14px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .event-block {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 10px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .event-left { display: flex; flex-direction: column; gap: 2px; }
+
+        .event-name {
+            font-weight: 600;
+            font-size: 13px;
+            color: #374151;
+        }
+
+        .event-time {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
+        .event-dur {
+            font-weight: 700;
+            font-size: 13px;
+            color: #4f46e5;
+            white-space: nowrap;
+        }
+
+        .event-block.unpaid {
+            background: #f3f4f6;
+        }
+
+        .unpaid-badge {
+            font-size: 10px;
+            font-weight: 600;
+            color: #9ca3af;
+            background: #e5e7eb;
+            padding: 2px 6px;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+
+        .accordion-empty {
+            font-size: 13px;
+            color: #9ca3af;
+            padding: 10px 0 4px 0;
+            font-style: italic;
+        }
+
+        /* Totaal */
         tfoot tr td {
             padding-top: 14px;
+            border-top: 2px solid #e5e7eb !important;
             font-weight: 700;
             font-size: 15px;
             color: #111827;
@@ -245,12 +330,13 @@
         tfoot .td-total-val {
             font-size: 17px;
             color: #111827;
+            text-align: right;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Betaalde uren</h1>
+        <h1>Mijn Rooster</h1>
 
         <div class="card">
             <span class="field-label">ICS URL</span>
@@ -259,14 +345,6 @@
                 <button class="btn" id="loadBtn" onclick="loadFromUrl()">Laden</button>
                 <button class="btn btn-ghost" id="clearBtn" onclick="clearSaved()" style="display:none" title="Opgeslagen URL verwijderen">&#x2715;</button>
             </div>
-
-            <details id="pasteSection">
-                <summary>Of plak ICS inhoud direct</summary>
-                <div class="paste-area">
-                    <textarea id="icsText" placeholder="Plak hier de volledige inhoud van het .ics bestand..."></textarea>
-                    <button class="btn btn-ghost" style="align-self:flex-start" onclick="loadFromText()">Verwerken</button>
-                </div>
-            </details>
         </div>
 
         <div id="alertBox" style="display:none"></div>
@@ -286,7 +364,7 @@
                     <tr>
                         <th>Dag</th>
                         <th>Datum</th>
-                        <th>Uren</th>
+                        <th>Betaalde uren</th>
                     </tr>
                 </thead>
                 <tbody id="tbody"></tbody>
@@ -301,7 +379,8 @@
     </div>
 
     <script>
-        const EXCLUDED = new Set(['Lunch', 'Afschalen_FO', 'Ziek', 'Te laat']);
+        const HIDDEN  = new Set([]);
+        const UNPAID  = new Set(['Lunch', 'Afschalen_FO', 'Ziek', 'Te laat']);
         const DAYS = ['Zondag', 'Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag'];
         const MONTHS = ['jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
 
@@ -312,6 +391,13 @@
 
         function amsterdamDate(d) {
             return new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Amsterdam' }).format(d);
+        }
+
+        function fmtTime(d) {
+            return new Intl.DateTimeFormat('nl-NL', {
+                timeZone: 'Europe/Amsterdam',
+                hour: '2-digit', minute: '2-digit', hour12: false
+            }).format(d);
         }
 
         function mondayOf(d) {
@@ -341,6 +427,14 @@
             return `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]}`;
         }
 
+        function getWeekNumber(d) {
+            const dt = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+            const day = dt.getUTCDay() || 7;
+            dt.setUTCDate(dt.getUTCDate() + 4 - day);
+            const yearStart = new Date(Date.UTC(dt.getUTCFullYear(), 0, 1));
+            return Math.ceil((((dt - yearStart) / 86400000) + 1) / 7);
+        }
+
         // --- ICS Parsing ---
 
         function unfold(text) {
@@ -356,7 +450,6 @@
         function parseDate(str) {
             if (!str) return null;
 
-            // UTC formaat: 20260713T080000Z
             if (/^\d{8}T\d{6}Z$/.test(str)) {
                 return new Date(
                     `${str.slice(0,4)}-${str.slice(4,6)}-${str.slice(6,8)}` +
@@ -364,10 +457,8 @@
                 );
             }
 
-            // Lokaal formaat zonder Z: 20260713T100000 (Amsterdam tijd)
             if (/^\d{8}T\d{6}$/.test(str)) {
                 const month = parseInt(str.slice(4, 6));
-                // CEST (UTC+2) van april t/m oktober, anders CET (UTC+1)
                 const offset = (month >= 4 && month <= 10) ? 2 : 1;
                 const naive = new Date(
                     `${str.slice(0,4)}-${str.slice(4,6)}-${str.slice(6,8)}` +
@@ -387,27 +478,81 @@
             for (let i = 1; i < blocks.length; i++) {
                 const block = blocks[i];
                 const summary = field(block, 'SUMMARY');
-                if (!summary || EXCLUDED.has(summary.trim())) continue;
+                if (!summary || HIDDEN.has(summary.trim())) continue;
 
                 const start = parseDate(field(block, 'DTSTART'));
                 const end   = parseDate(field(block, 'DTEND'));
 
                 if (!start || !end || end <= start) continue;
 
+                const name = summary.trim();
                 result.push({
-                    summary: summary.trim(),
+                    summary: name,
                     dateKey: amsterdamDate(start),
-                    durationMs: end - start
+                    durationMs: end - start,
+                    paid: !UNPAID.has(name),
+                    start,
+                    end
                 });
             }
 
             return result;
         }
 
+        // --- Kopieer naar klembord ---
+
+        function copyHours(e, value) {
+            e.stopPropagation();
+            navigator.clipboard.writeText(value).then(() => {
+                const btn = e.currentTarget;
+                btn.classList.add('copied');
+                btn.innerHTML = copiedIcon();
+                setTimeout(() => {
+                    btn.classList.remove('copied');
+                    btn.innerHTML = copyIcon();
+                }, 1500);
+            });
+        }
+
+        function copyIcon() {
+            return `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2"/>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>`;
+        }
+
+        function copiedIcon() {
+            return `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+            </svg>`;
+        }
+
+        // --- Accordeon ---
+
+        function toggleAccordion(key) {
+            const content = document.getElementById(`ac-${key}`);
+            const chevron = document.getElementById(`ch-${key}`);
+            if (!content) return;
+
+            const isOpen = content.classList.contains('open');
+
+            document.querySelectorAll('.accordion-content.open').forEach(el => el.classList.remove('open'));
+            document.querySelectorAll('.chevron.open').forEach(el => el.classList.remove('open'));
+
+            if (!isOpen) {
+                content.classList.add('open');
+                if (chevron) chevron.classList.add('open');
+            }
+        }
+
         // --- Weergave ---
 
         function msToHours(ms) {
             return (ms / 3600000).toFixed(2) + ' u';
+        }
+
+        function fmtHours(ms) {
+            return (ms / 3600000).toFixed(2).replace('.', ',');
         }
 
         function renderWeek() {
@@ -417,17 +562,24 @@
             document.getElementById('weekRange').textContent =
                 `${displayDate(weekStart)} – ${displayDate(sunday)}`;
             document.getElementById('weekYear').textContent =
-                sunday.getUTCFullYear();
+                `(week ${getWeekNumber(weekStart)}) ${sunday.getUTCFullYear()}`;
 
-            // Bouw dagtotalen op voor deze week
+            // Groepeer events per dag
             const totals = {};
+            const byDay = {};
             for (let i = 0; i < 7; i++) {
-                totals[dateKey(shiftDays(weekStart, i))] = 0;
+                const key = dateKey(shiftDays(weekStart, i));
+                totals[key] = 0;
+                byDay[key] = [];
             }
             for (const ev of events) {
                 if (ev.dateKey in totals) {
-                    totals[ev.dateKey] += ev.durationMs;
+                    if (ev.paid) totals[ev.dateKey] += ev.durationMs;
+                    byDay[ev.dateKey].push(ev);
                 }
+            }
+            for (const key in byDay) {
+                byDay[key].sort((a, b) => a.start - b.start);
             }
 
             const tbody = document.getElementById('tbody');
@@ -438,24 +590,62 @@
                 const d = shiftDays(weekStart, i);
                 const key = dateKey(d);
                 const ms = totals[key];
+                const dayEvs = byDay[key];
                 weekMs += ms;
 
                 const isToday = key === todayKey;
                 const dow = d.getUTCDay();
 
+                // Dag rij
                 const tr = document.createElement('tr');
-                if (isToday) tr.classList.add('today');
+                tr.className = 'day-row' + (isToday ? ' today' : '');
+                tr.onclick = () => toggleAccordion(key);
 
-                const hoursCell = ms > 0
-                    ? `<td class="td-hours-val">${(ms / 3600000).toFixed(2).replace('.', ',')}</td>`
-                    : `<td class="td-hours-zero">—</td>`;
+                const hoursHtml = ms > 0
+                    ? `<div class="hours-cell">
+                            <span class="td-hours-val">${fmtHours(ms)}</span>
+                            <button class="copy-btn" title="Kopieer" onclick="copyHours(event, '${fmtHours(ms)}')">${copyIcon()}</button>
+                       </div>`
+                    : `<span class="td-hours-zero">—</span>`;
 
                 tr.innerHTML = `
-                    <td class="td-dag">${DAYS[dow]}</td>
+                    <td class="td-dag"><i class="chevron" id="ch-${key}">›</i>${DAYS[dow]}${isToday ? '<span class="today-badge">VANDAAG</span>' : ''}</td>
                     <td class="td-date">${displayDate(d)}</td>
-                    ${hoursCell}
+                    <td>${hoursHtml}</td>
                 `;
+
+                // Accordeon rij
+                const acTr = document.createElement('tr');
+                acTr.className = 'accordion-row';
+
+                let blocksHtml = '';
+                if (dayEvs.length > 0) {
+                    blocksHtml = dayEvs.map(ev => `
+                        <div class="event-block${ev.paid ? '' : ' unpaid'}">
+                            <div class="event-left">
+                                <span class="event-name">${ev.summary}</span>
+                                <span class="event-time">${fmtTime(ev.start)} – ${fmtTime(ev.end)}</span>
+                            </div>
+                            ${ev.paid
+                                ? `<span class="event-dur">${fmtHours(ev.durationMs)} u</span>`
+                                : `<span class="unpaid-badge">Onbetaald</span>`
+                            }
+                        </div>
+                    `).join('');
+                } else {
+                    blocksHtml = '<div class="accordion-empty">Geen werkuren op deze dag</div>';
+                }
+
+                acTr.innerHTML = `
+                    <td colspan="3">
+                        <div class="accordion-content" id="ac-${key}">
+                            <div class="accordion-inner">${blocksHtml}</div>
+                        </div>
+                    </td>
+                `;
+
                 tbody.appendChild(tr);
+                tbody.appendChild(acTr);
             }
 
             document.getElementById('weekTotal').textContent = msToHours(weekMs);
@@ -466,6 +656,7 @@
             weekStart = shiftDays(weekStart, dir * 7);
             renderWeek();
         }
+
 
         // --- Laden ---
 
@@ -498,29 +689,14 @@
                 process(text);
             } catch (err) {
                 const isCors = err instanceof TypeError;
-                if (isCors) {
-                    showAlert(
-                        '<strong>URL kon niet worden geladen vanuit de browser.</strong><br>' +
-                        'Dit komt door een CORS-beperking van de server. Gebruik de optie hieronder:<br><br>' +
-                        '1. Open de URL in een nieuw tabblad<br>' +
-                        '2. Kopieer alle tekst op de pagina (Cmd+A → Cmd+C)<br>' +
-                        '3. Plak de inhoud in het tekstveld "Of plak ICS inhoud direct"'
-                    );
-                    document.getElementById('pasteSection').open = true;
-                } else {
-                    showAlert(`Fout bij laden: ${err.message}`);
-                }
+                showAlert(isCors
+                    ? '<strong>URL kon niet worden geladen vanuit de browser.</strong><br>Dit komt door een CORS-beperking van de server. Probeer de pagina te vernieuwen of gebruik een andere browser.'
+                    : `Fout bij laden: ${err.message}`
+                );
             } finally {
                 btn.disabled = false;
                 btn.textContent = 'Laden';
             }
-        }
-
-        function loadFromText() {
-            const text = document.getElementById('icsText').value.trim();
-            if (!text) { showAlert('Plak eerst ICS inhoud in het tekstveld.'); return; }
-            hideAlert();
-            process(text);
         }
 
         function process(text) {
@@ -530,7 +706,7 @@
             }
             events = parseICS(text);
             if (events.length === 0) {
-                showAlert('Geen werkuren gevonden in dit ICS bestand. Controleer of de events de juiste namen hebben.');
+                showAlert('Geen werkuren gevonden in dit ICS bestand.');
                 return;
             }
             weekStart = mondayOf(new Date());
