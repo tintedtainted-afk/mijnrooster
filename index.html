@@ -61,21 +61,6 @@
 
         .btn-today:hover { background: var(--accent-tint-hover); }
 
-        .week-copy-btn {
-            margin-left: 8px;
-            padding: 4px 10px;
-            background: var(--accent-tint);
-            color: var(--accent-dark);
-            border: 1.5px solid #d8c4fb;
-            border-radius: 999px;
-            font-size: 11px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.15s;
-        }
-
-        .week-copy-btn:hover { background: var(--accent-tint-hover); }
-
         .card {
             background: #fff;
             border: 1px solid #efefed;
@@ -444,10 +429,7 @@
                 <tbody id="tbody"></tbody>
                 <tfoot>
                     <tr>
-                        <td colspan="2" style="color:#6b7280;font-size:13px;font-weight:600">
-                            Totaal week
-                            <button class="week-copy-btn" id="copyWeekBtn" onclick="copyWeek(event)">Kopieer week</button>
-                        </td>
+                        <td colspan="2" style="color:#6b7280;font-size:13px;font-weight:600">Totaal week</td>
                         <td class="td-total-val" id="weekTotal"></td>
                     </tr>
                 </tfoot>
@@ -463,7 +445,6 @@
 
         let events = [];
         let weekStart = mondayOf(new Date());
-        let weekTotals = {};
 
         // --- Datum hulpfuncties ---
 
@@ -662,7 +643,6 @@
             for (const key in byDay) {
                 byDay[key].sort((a, b) => a.start - b.start);
             }
-            weekTotals = totals;
 
             const tbody = document.getElementById('tbody');
             tbody.innerHTML = '';
@@ -749,22 +729,6 @@
         function goToToday() {
             weekStart = mondayOf(new Date());
             renderWeek();
-        }
-
-        function copyWeek(e) {
-            const parts = [];
-            for (let i = 0; i < 7; i++) {
-                const key = dateKey(shiftDays(weekStart, i));
-                const ms = weekTotals[key] || 0;
-                parts.push(ms > 0 ? fmtHours(ms) : '');
-            }
-            const text = parts.join(';');
-            navigator.clipboard.writeText(text).then(() => {
-                const btn = e.currentTarget;
-                const original = btn.textContent;
-                btn.textContent = 'Gekopieerd!';
-                setTimeout(() => { btn.textContent = original; }, 1500);
-            });
         }
 
         // --- Swipe navigatie (mobiel) ---
