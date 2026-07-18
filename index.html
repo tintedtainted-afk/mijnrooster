@@ -129,9 +129,9 @@
 
         /* Week navigatie */
         .week-nav {
-            display: flex;
+            display: grid;
+            grid-template-columns: 32% 38% 30%;
             align-items: center;
-            justify-content: space-between;
             margin-bottom: 18px;
         }
 
@@ -148,12 +148,14 @@
 
         .btn-nav:hover { background: #f3f4f6; border-color: #d1d5db; }
 
+        .week-nav .btn-nav:first-child { justify-self: start; }
+        .week-nav .btn-nav:last-child { justify-self: end; }
 
         .week-label {
             font-size: 14px;
             font-weight: 600;
             color: #111827;
-            text-align: center;
+            text-align: left;
         }
 
         .week-label small {
