@@ -159,10 +159,9 @@
             text-align: left;
         }
 
-        thead th:nth-child(1) { width: 30%; }
-        thead th:nth-child(2) { width: 15%; text-align: center; }
-        thead th:nth-child(3) { width: 24%; text-align: left; }
-        thead th:nth-child(4) { width: 31%; text-align: right; }
+        thead th:nth-child(1) { width: 32%; }
+        thead th:nth-child(2) { width: 38%; }
+        thead th:nth-child(3) { width: 30%; text-align: right; }
 
         /* Dag rijen */
         .day-row td {
@@ -212,12 +211,27 @@
             flex-shrink: 0;
         }
 
-        .td-date { color: #9ca3af; font-size: 13px; text-align: center; }
-        .td-time { color: #6b7280; font-size: 13px; text-align: left; white-space: nowrap; }
+        .td-datum {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .td-datum .date-main {
+            color: #374151;
+            font-size: 13.5px;
+            font-weight: 600;
+        }
+
+        .td-datum .time-sub {
+            color: #9ca3af;
+            font-size: 12px;
+        }
 
         @media (max-width: 380px) {
             .day-row td { font-size: 13px; }
-            .td-date, .td-time { font-size: 11.5px; }
+            .td-datum .date-main { font-size: 12.5px; }
+            .td-datum .time-sub { font-size: 11px; }
             .chevron { margin-right: 3px; }
             .today-dot { margin-left: 4px; }
         }
@@ -371,14 +385,13 @@
                     <tr>
                         <th>Dag</th>
                         <th>Datum</th>
-                        <th>Tijd</th>
-                        <th>Betaalde uren</th>
+                        <th>Uren</th>
                     </tr>
                 </thead>
                 <tbody id="tbody"></tbody>
                 <tfoot>
                     <tr>
-                        <td colspan="3" style="color:#6b7280;font-size:13px;font-weight:600">Totaal week</td>
+                        <td colspan="2" style="color:#6b7280;font-size:13px;font-weight:600">Totaal week</td>
                         <td class="td-total-val" id="weekTotal"></td>
                     </tr>
                 </tfoot>
@@ -622,8 +635,10 @@
 
                 tr.innerHTML = `
                     <td class="td-dag"><i class="chevron" id="ch-${key}">›</i>${DAYS[dow]}${isToday ? '<span class="today-dot" title="Vandaag"></span>' : ''}</td>
-                    <td class="td-date">${displayDate(d)}</td>
-                    <td class="td-time">${timeHtml}</td>
+                    <td class="td-datum">
+                        <span class="date-main">${displayDate(d)}</span>
+                        <span class="time-sub">${timeHtml}</span>
+                    </td>
                     <td>${hoursHtml}</td>
                 `;
 
@@ -650,7 +665,7 @@
                 }
 
                 acTr.innerHTML = `
-                    <td colspan="4">
+                    <td colspan="3">
                         <div class="accordion-content" id="ac-${key}">
                             <div class="accordion-inner">${blocksHtml}</div>
                         </div>
