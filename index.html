@@ -175,6 +175,9 @@
             margin-top: 2px;
         }
 
+        #resultsCard { overflow: hidden; }
+        #weekContent { min-width: 0; }
+
         /* Tabel */
         table {
             width: 100%;
@@ -418,22 +421,24 @@
                 <button class="btn-nav" onclick="changeWeek(1)">&#8594;</button>
             </div>
 
-            <table>
-                <thead>
-                    <tr>
-                        <th>Dag</th>
-                        <th>Datum</th>
-                        <th>Uren</th>
-                    </tr>
-                </thead>
-                <tbody id="tbody"></tbody>
-                <tfoot>
-                    <tr>
-                        <td colspan="2" style="color:#6b7280;font-size:13px;font-weight:600">Totaal week</td>
-                        <td class="td-total-val" id="weekTotal"></td>
-                    </tr>
-                </tfoot>
-            </table>
+            <div id="weekContent">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Dag</th>
+                            <th>Datum</th>
+                            <th>Uren</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody"></tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="2" style="color:#6b7280;font-size:13px;font-weight:600">Totaal week</td>
+                            <td class="td-total-val" id="weekTotal"></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -722,13 +727,56 @@
         }
 
         function changeWeek(dir) {
-            weekStart = shiftDays(weekStart, dir * 7);
-            renderWeek();
+            animateWeekChange(dir, () => {
+                weekStart = shiftDays(weekStart, dir * 7);
+                renderWeek();
+            });
         }
 
         function goToToday() {
-            weekStart = mondayOf(new Date());
-            renderWeek();
+            const newStart = mondayOf(new Date());
+            const dir = newStart > weekStart ? 1 : (newStart < weekStart ? -1 : 0);
+            if (dir === 0) return;
+            animateWeekChange(dir, () => {
+                weekStart = newStart;
+                renderWeek();
+            });
+        }
+
+        function animateWeekChange(dir, updateFn) {
+            const card = document.getElementById('resultsCard');
+            const label = document.querySelector('.week-label');
+            const content = document.getElementById('weekContent');
+            const els = [label, content].filter(Boolean);
+
+            if (!card || els.length === 0) { updateFn(); return; }
+
+            const distance = card.clientWidth;
+            const outX = dir > 0 ? -distance : distance;
+            const inX = -outX;
+
+            els.forEach(el => {
+                el.style.transition = 'transform 0.22s ease, opacity 0.22s ease';
+                el.style.transform = `translateX(${outX}px)`;
+                el.style.opacity = '0';
+            });
+
+            setTimeout(() => {
+                updateFn();
+
+                els.forEach(el => {
+                    el.style.transition = 'none';
+                    el.style.transform = `translateX(${inX}px)`;
+                });
+
+                void card.offsetWidth; // force reflow
+
+                els.forEach(el => {
+                    el.style.transition = 'transform 0.22s ease, opacity 0.22s ease';
+                    el.style.transform = 'translateX(0)';
+                    el.style.opacity = '1';
+                });
+            }, 220);
         }
 
         // --- Swipe navigatie (mobiel) ---
