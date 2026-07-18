@@ -159,9 +159,10 @@
             text-align: left;
         }
 
-        thead th:nth-child(1) { width: 45%; }
-        thead th:nth-child(2) { width: 20%; text-align: center; }
-        thead th:nth-child(3) { width: 35%; text-align: right; }
+        thead th:nth-child(1) { width: 30%; }
+        thead th:nth-child(2) { width: 15%; text-align: center; }
+        thead th:nth-child(3) { width: 24%; text-align: left; }
+        thead th:nth-child(4) { width: 31%; text-align: right; }
 
         /* Dag rijen */
         .day-row td {
@@ -200,20 +201,26 @@
             color: #4f46e5;
         }
 
-        .today-badge {
+        .today-dot {
             display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
             background: #4f46e5;
-            color: #fff;
-            font-size: 9px;
-            font-weight: 700;
-            padding: 2px 5px;
-            border-radius: 4px;
-            margin-left: 7px;
-            letter-spacing: 0.5px;
+            margin-left: 6px;
             vertical-align: middle;
+            flex-shrink: 0;
         }
 
         .td-date { color: #9ca3af; font-size: 13px; text-align: center; }
+        .td-time { color: #6b7280; font-size: 13px; text-align: left; white-space: nowrap; }
+
+        @media (max-width: 380px) {
+            .day-row td { font-size: 13px; }
+            .td-date, .td-time { font-size: 11.5px; }
+            .chevron { margin-right: 3px; }
+            .today-dot { margin-left: 4px; }
+        }
 
         /* Uren cel */
         .hours-cell {
@@ -364,13 +371,14 @@
                     <tr>
                         <th>Dag</th>
                         <th>Datum</th>
+                        <th>Tijd</th>
                         <th>Betaalde uren</th>
                     </tr>
                 </thead>
                 <tbody id="tbody"></tbody>
                 <tfoot>
                     <tr>
-                        <td colspan="2" style="color:#6b7280;font-size:13px;font-weight:600">Totaal week</td>
+                        <td colspan="3" style="color:#6b7280;font-size:13px;font-weight:600">Totaal week</td>
                         <td class="td-total-val" id="weekTotal"></td>
                     </tr>
                 </tfoot>
@@ -608,9 +616,14 @@
                        </div>`
                     : `<span class="td-hours-zero">—</span>`;
 
+                const timeHtml = dayEvs.length > 0
+                    ? `${fmtTime(dayEvs.reduce((min, ev) => ev.start < min ? ev.start : min, dayEvs[0].start))} - ${fmtTime(dayEvs.reduce((max, ev) => ev.end > max ? ev.end : max, dayEvs[0].end))}`
+                    : '—';
+
                 tr.innerHTML = `
-                    <td class="td-dag"><i class="chevron" id="ch-${key}">›</i>${DAYS[dow]}${isToday ? '<span class="today-badge">VANDAAG</span>' : ''}</td>
+                    <td class="td-dag"><i class="chevron" id="ch-${key}">›</i>${DAYS[dow]}${isToday ? '<span class="today-dot" title="Vandaag"></span>' : ''}</td>
                     <td class="td-date">${displayDate(d)}</td>
+                    <td class="td-time">${timeHtml}</td>
                     <td>${hoursHtml}</td>
                 `;
 
@@ -637,7 +650,7 @@
                 }
 
                 acTr.innerHTML = `
-                    <td colspan="3">
+                    <td colspan="4">
                         <div class="accordion-content" id="ac-${key}">
                             <div class="accordion-inner">${blocksHtml}</div>
                         </div>
