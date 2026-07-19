@@ -74,8 +74,6 @@
             transition: background 0.15s;
         }
 
-        .btn-today:hover { background: var(--accent-tint-hover); }
-
         .card {
             background: #fff;
             border: 1px solid #efefed;
@@ -169,15 +167,12 @@
             white-space: nowrap;
         }
 
-        .btn:hover { background: #000; }
         .btn:disabled { background: #9ca3af; cursor: not-allowed; }
 
         .btn-ghost {
             background: #f3f4f6;
             color: #374151;
         }
-
-        .btn-ghost:hover { background: #e5e7eb; }
 
         .alert {
             border-radius: 8px;
@@ -211,8 +206,6 @@
             cursor: pointer;
             transition: background 0.1s, border-color 0.1s;
         }
-
-        .btn-nav:hover { background: #f3f4f6; border-color: #d1d5db; }
 
         .week-nav .btn-nav:first-child { justify-self: start; }
         .week-nav .btn-nav:last-child { justify-self: end; }
@@ -269,9 +262,7 @@
             cursor: pointer;
         }
 
-        .day-row:hover td { background: #f6f6f5; }
         .day-row.today td { background: var(--accent-tint); }
-        .day-row.today:hover td { background: var(--accent-tint-hover); }
 
         .td-dag {
             font-weight: 600;
@@ -447,6 +438,23 @@
             text-align: right;
         }
 
+        /* Hover-effecten alleen voor muis-apparaten: op touchscreens veroorzaakt :hover
+           anders dat je een element twee keer moet tikken (WebKit-eigenaardigheid). */
+        @media (hover: hover) and (pointer: fine) {
+            .btn-today:hover { background: var(--accent-tint-hover); }
+            .btn:hover { background: #000; }
+            .btn-ghost:hover { background: #e5e7eb; }
+            .btn-nav:hover { background: #f3f4f6; border-color: #d1d5db; }
+            .day-row:hover td { background: #f6f6f5; }
+            .day-row.today:hover td { background: var(--accent-tint-hover); }
+            .day-row:hover .copy-btn { opacity: 1; }
+            .copy-btn:hover { color: var(--accent); }
+        }
+
+        /* Op touchscreens is er geen hover om de kopieerknop te onthullen, dus altijd tonen. */
+        @media (hover: none) {
+            .copy-btn { opacity: 1; }
+        }
     </style>
 </head>
 <body>
