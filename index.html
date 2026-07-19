@@ -43,6 +43,18 @@
             margin-bottom: 20px;
         }
 
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .brand-icon {
+            width: 28px;
+            height: 28px;
+            display: block;
+        }
+
         h1 {
             font-size: 22px;
             font-weight: 700;
@@ -98,9 +110,9 @@
 
         .steps-list li {
             counter-increment: step;
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
+            position: relative;
+            padding-left: 30px;
+            text-align: left;
             font-size: 14px;
             color: #374151;
             line-height: 1.5;
@@ -108,7 +120,9 @@
 
         .steps-list li::before {
             content: counter(step);
-            flex-shrink: 0;
+            position: absolute;
+            left: 0;
+            top: 1px;
             width: 20px;
             height: 20px;
             border-radius: 50%;
@@ -119,7 +133,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-top: 1px;
         }
 
         .step-icon {
@@ -440,7 +453,10 @@
 <body>
     <div class="container">
         <div class="header-row">
-            <h1>Mijn Rooster</h1>
+            <div class="brand">
+                <img src="icon.png" alt="" class="brand-icon">
+                <h1>Mijn Rooster</h1>
+            </div>
             <button class="btn-today" id="todayBtn" onclick="goToToday()" style="display:none">Naar vandaag</button>
         </div>
 
