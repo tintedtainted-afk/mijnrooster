@@ -1,6 +1,6 @@
 {
     "name": "Mijn Rooster",
-    "short_name": "Rooster",
+    "short_name": "Mijn Rooster",
     "start_url": "./index.html",
     "scope": "./",
     "display": "standalone",
