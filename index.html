@@ -88,6 +88,47 @@
             gap: 8px;
         }
 
+        .steps-list {
+            list-style: none;
+            counter-reset: step;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .steps-list li {
+            counter-increment: step;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 14px;
+            color: #374151;
+            line-height: 1.5;
+        }
+
+        .steps-list li::before {
+            content: counter(step);
+            flex-shrink: 0;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent-tint);
+            color: var(--accent-dark);
+            font-size: 11px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 1px;
+        }
+
+        .step-icon {
+            display: inline-flex;
+            vertical-align: middle;
+            color: var(--accent);
+            margin-left: 2px;
+        }
+
         input[type="url"] {
             flex: 1;
             padding: 10px 14px;
@@ -410,6 +451,17 @@
                 <button class="btn" id="loadBtn" onclick="loadFromUrl()">Laden</button>
                 <button class="btn btn-ghost" id="clearBtn" onclick="clearSaved()" style="display:none" title="Opgeslagen URL verwijderen">&#x2715;</button>
             </div>
+        </div>
+
+        <div class="card" id="onboardingSteps">
+            <span class="field-label">Zo vind je je ICS-URL</span>
+            <ol class="steps-list">
+                <li>Open Genesys</li>
+                <li>Klik op <strong>Mijn Activiteit</strong> &#8594; <strong>Planning</strong></li>
+                <li>Klik rechtsboven op het kalenderkoppeling-icoon <span class="step-icon"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span></li>
+                <li>Kopieer de ICS-URL</li>
+                <li>Plak de ICS-URL in het veld hierboven en druk op <strong>Laden</strong></li>
+            </ol>
         </div>
 
         <div id="alertBox" style="display:none"></div>
@@ -866,6 +918,7 @@
             }
             weekStart = mondayOf(new Date());
             renderWeek();
+            document.getElementById('onboardingSteps').style.display = 'none';
         }
 
         function clearSaved() {
@@ -873,6 +926,7 @@
             document.getElementById('icsUrl').value = '';
             document.getElementById('clearBtn').style.display = 'none';
             document.getElementById('resultsCard').style.display = 'none';
+            document.getElementById('onboardingSteps').style.display = '';
             hideAlert();
             events = [];
         }
