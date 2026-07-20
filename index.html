@@ -266,7 +266,7 @@
             color: #9ca3af;
             text-transform: uppercase;
             letter-spacing: 0.6px;
-            padding-bottom: 10px;
+            padding: 0 6px 10px;
             text-align: left;
         }
 
@@ -276,7 +276,7 @@
 
         /* Dag rijen */
         .day-row td {
-            padding: 11px 0;
+            padding: 11px 6px;
             border-top: 1px solid #f3f4f6;
             font-size: 14.5px;
             vertical-align: middle;
@@ -506,7 +506,7 @@
             <span class="field-label">ICS URL</span>
             <div class="input-row">
                 <input type="url" id="icsUrl" placeholder="https://...">
-                <button class="btn" id="loadBtn" onclick="loadFromUrl()">Laden</button>
+                <button class="btn" id="loadBtn" onclick="loadFromUrl()">Importeren</button>
                 <button class="btn btn-ghost" id="clearBtn" onclick="clearSaved()" style="display:none" title="Opgeslagen URL verwijderen">&#x2715;</button>
             </div>
         </div>
@@ -518,7 +518,7 @@
                 <li>Klik op <strong>Mijn Activiteit</strong> &#8594; <strong>Planning</strong></li>
                 <li>Klik rechtsboven op het kalenderkoppeling-icoon <span class="step-icon"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span></li>
                 <li>Kopieer de ICS-URL</li>
-                <li>Plak de ICS-URL in het veld hierboven en druk op <strong>Laden</strong></li>
+                <li>Plak de ICS-URL in het veld hierboven en druk op <strong>Importeren</strong></li>
             </ol>
         </div>
 
@@ -968,7 +968,7 @@
             clearTimeout(loadBtnTimeout);
             btn.disabled = true;
             btn.classList.remove('btn-loaded');
-            btn.textContent = 'Laden…';
+            btn.textContent = 'Importeren…';
 
             try {
                 const res = await fetch(url);
@@ -990,7 +990,7 @@
                         refreshEl.classList.add('visible');
                     }, 1400);
                 } else {
-                    btn.textContent = 'Laden';
+                    btn.textContent = 'Importeren';
                 }
             } catch (err) {
                 const isCors = err instanceof TypeError;
@@ -998,7 +998,7 @@
                     ? '<strong>URL kon niet worden geladen vanuit de browser.</strong><br>Dit komt door een CORS-beperking van de server. Probeer de pagina te vernieuwen of gebruik een andere browser.'
                     : `Fout bij laden: ${err.message}`
                 );
-                btn.textContent = 'Laden';
+                btn.textContent = 'Importeren';
             } finally {
                 btn.disabled = false;
             }
@@ -1028,7 +1028,7 @@
             clearTimeout(loadBtnTimeout);
             const btn = document.getElementById('loadBtn');
             btn.classList.remove('btn-loaded');
-            btn.textContent = 'Laden';
+            btn.textContent = 'Importeren';
             hideAlert();
             events = [];
         }
