@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mijn Rooster</title>
+    <meta name="description" content="Bekijk je werkrooster en betaalde uren per week, rechtstreeks vanuit je ICS-agenda.">
     <link rel="icon" href="icon.png" type="image/png">
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <link rel="manifest" href="manifest.json">
@@ -11,6 +12,17 @@
     <meta name="apple-mobile-web-app-title" content="Mijn Rooster">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://dfnrooster.nl/">
+    <meta property="og:title" content="Mijn Rooster">
+    <meta property="og:description" content="Bekijk je werkrooster en betaalde uren per week, rechtstreeks vanuit je ICS-agenda.">
+    <meta property="og:image" content="https://dfnrooster.nl/icon-512.png">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Mijn Rooster">
+    <meta name="twitter:description" content="Bekijk je werkrooster en betaalde uren per week, rechtstreeks vanuit je ICS-agenda.">
+    <meta name="twitter:image" content="https://dfnrooster.nl/icon-512.png">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -138,6 +150,64 @@
             vertical-align: middle;
             color: var(--accent);
             margin-left: 2px;
+        }
+
+        .install-guide-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+
+        .install-guide-content {
+            overflow: hidden;
+            max-height: 0;
+            transition: max-height 0.3s ease;
+        }
+
+        .install-guide-inner {
+            padding-top: 12px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .platform-block {
+            border-top: 1px solid #f3f4f6;
+        }
+
+        .platform-block:first-child { border-top: none; }
+
+        .platform-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            padding: 12px 0;
+        }
+
+        .platform-heading {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--ink);
+        }
+
+        .platform-content {
+            overflow: hidden;
+            max-height: 0;
+            transition: max-height 0.25s ease;
+        }
+
+        .platform-inner {
+            padding: 0 0 14px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .install-note {
+            font-size: 12.5px;
+            color: #6b7280;
+            line-height: 1.5;
         }
 
         input[type="url"] {
@@ -296,9 +366,9 @@
         }
 
         .chevron {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
             color: #d1d5db;
-            font-size: 13px;
             margin-right: 6px;
             transition: transform 0.2s, color 0.2s;
             font-style: normal;
@@ -553,6 +623,124 @@
                 </table>
             </div>
         </div>
+
+        <div class="card" id="installGuideCard" style="display:none">
+            <div class="install-guide-header" onclick="toggleInstallGuide()">
+                <span class="field-label" style="margin-bottom:0">Installeren als app</span>
+                <i class="chevron" id="installChevron"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg></i>
+            </div>
+            <div class="install-guide-content" id="installGuideContent">
+                <div class="install-guide-inner">
+
+                    <div class="platform-block">
+                        <div class="platform-header" onclick="togglePlatform('chrome-desktop')">
+                            <span class="platform-heading">Chrome (desktop)</span>
+                            <i class="chevron" id="pch-chrome-desktop"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg></i>
+                        </div>
+                        <div class="platform-content" id="pc-chrome-desktop">
+                            <div class="platform-inner">
+                                <ol class="steps-list">
+                                    <li>Open de website in Chrome</li>
+                                    <li>Klik op het installatie-icoontje rechts in de adresbalk (beeldscherm met pijl naar beneden)</li>
+                                    <li>Klik op <strong>Installeren</strong> in het pop-upvenster</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="platform-block">
+                        <div class="platform-header" onclick="togglePlatform('chrome-ios')">
+                            <span class="platform-heading">Chrome (iOS)</span>
+                            <i class="chevron" id="pch-chrome-ios"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg></i>
+                        </div>
+                        <div class="platform-content" id="pc-chrome-ios">
+                            <div class="platform-inner">
+                                <ol class="steps-list">
+                                    <li>Open de website in Chrome</li>
+                                    <li>Tik op het deel-icoon in de adresbalk</li>
+                                    <li>Scroll naar <strong>Voeg toe aan beginscherm</strong></li>
+                                    <li>Pas eventueel de naam aan</li>
+                                    <li>Tik op <strong>Voeg toe</strong></li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="platform-block">
+                        <div class="platform-header" onclick="togglePlatform('chrome-android')">
+                            <span class="platform-heading">Chrome (Android)</span>
+                            <i class="chevron" id="pch-chrome-android"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg></i>
+                        </div>
+                        <div class="platform-content" id="pc-chrome-android">
+                            <div class="platform-inner">
+                                <ol class="steps-list">
+                                    <li>Open de website in Chrome</li>
+                                    <li>Tik op het menu-icoon (drie puntjes) rechtsboven</li>
+                                    <li>Tik op <strong>App installeren</strong> (of <strong>Toevoegen aan startscherm</strong>)</li>
+                                    <li>Pas eventueel de naam aan</li>
+                                    <li>Tik op <strong>Toevoegen</strong></li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="platform-block">
+                        <div class="platform-header" onclick="togglePlatform('edge-desktop')">
+                            <span class="platform-heading">Microsoft Edge (desktop)</span>
+                            <i class="chevron" id="pch-edge-desktop"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg></i>
+                        </div>
+                        <div class="platform-content" id="pc-edge-desktop">
+                            <div class="platform-inner">
+                                <ol class="steps-list">
+                                    <li>Open de website in Edge</li>
+                                    <li>Klik op het "App beschikbaar"-icoon in de adresbalk (beeldscherm-symbool met pijl naar beneden)</li>
+                                    <li>Klik op <strong>Installeren</strong> in het pop-upvenster</li>
+                                </ol>
+                                <p class="install-note">Alternatief, als dat icoon niet verschijnt: menu (drie puntjes) &#8594; <strong>Apps</strong> &#8594; <strong>Deze site als app installeren</strong></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="platform-block">
+                        <div class="platform-header" onclick="togglePlatform('safari-desktop')">
+                            <span class="platform-heading">Safari (desktop)</span>
+                            <i class="chevron" id="pch-safari-desktop"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg></i>
+                        </div>
+                        <div class="platform-content" id="pc-safari-desktop">
+                            <div class="platform-inner">
+                                <ol class="steps-list">
+                                    <li>Open de website in Safari</li>
+                                    <li>Klik op het deel-icoon in de werkbalk (of ga via het menu naar Archief &gt; Voeg toe aan Dock)</li>
+                                    <li>Kies <strong>Voeg toe aan Dock</strong></li>
+                                    <li>Pas eventueel de naam aan</li>
+                                    <li>Klik op <strong>Voeg toe</strong></li>
+                                </ol>
+                                <p class="install-note">Vereist macOS Sonoma (14) of nieuwer. De app verschijnt daarna in het Dock, Launchpad én is doorzoekbaar via Spotlight.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="platform-block">
+                        <div class="platform-header" onclick="togglePlatform('safari-ios')">
+                            <span class="platform-heading">Safari (iOS)</span>
+                            <i class="chevron" id="pch-safari-ios"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg></i>
+                        </div>
+                        <div class="platform-content" id="pc-safari-ios">
+                            <div class="platform-inner">
+                                <ol class="steps-list">
+                                    <li>Open de website in Safari</li>
+                                    <li>Tik op het deel-icoon (vierkant met pijl omhoog) onderin de balk</li>
+                                    <li>Scroll naar beneden en tik op <strong>Voeg toe aan beginscherm</strong></li>
+                                    <li>Zorg dat "Open als webapp" aan staat</li>
+                                    <li>Pas eventueel de naam aan en tik op <strong>Voeg toe</strong></li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -745,6 +933,56 @@
             }
         }
 
+        function toggleInstallGuide() {
+            const content = document.getElementById('installGuideContent');
+            const chevron = document.getElementById('installChevron');
+            const isOpen = content.classList.contains('open');
+
+            if (isOpen) {
+                // Eerst een concrete hoogte zetten (kan niet animeren vanaf 'none'), dan pas dichtklappen.
+                content.style.maxHeight = content.scrollHeight + 'px';
+                void content.offsetHeight; // forceer reflow
+                content.style.maxHeight = '0px';
+                content.classList.remove('open');
+                chevron.classList.remove('open');
+            } else {
+                content.classList.add('open');
+                chevron.classList.add('open');
+                content.style.maxHeight = content.scrollHeight + 'px';
+
+                content.addEventListener('transitionend', function handler(e) {
+                    if (e.propertyName === 'max-height') {
+                        // Geen hoogtelimiet meer zodra open: geneste accordions kunnen dan nooit
+                        // meer afgesneden worden, ongeacht hoe hoog hun inhoud wordt.
+                        if (content.classList.contains('open')) {
+                            content.style.maxHeight = 'none';
+                        }
+                        content.removeEventListener('transitionend', handler);
+                    }
+                });
+            }
+        }
+
+        function togglePlatform(id) {
+            const content = document.getElementById(`pc-${id}`);
+            const chevron = document.getElementById(`pch-${id}`);
+            if (!content) return;
+
+            const isOpen = content.classList.contains('open');
+
+            document.querySelectorAll('.platform-content.open').forEach(el => {
+                el.classList.remove('open');
+                el.style.maxHeight = '0px';
+            });
+            document.querySelectorAll('.platform-header .chevron.open').forEach(el => el.classList.remove('open'));
+
+            if (!isOpen) {
+                content.classList.add('open');
+                if (chevron) chevron.classList.add('open');
+                content.style.maxHeight = content.scrollHeight + 'px';
+            }
+        }
+
         // --- Weergave ---
 
         function msToHours(ms) {
@@ -816,7 +1054,7 @@
                     : '—';
 
                 tr.innerHTML = `
-                    <td class="td-dag"><i class="chevron" id="ch-${key}">›</i>${DAYS[dow]}${isToday ? '<span class="today-dot" title="Vandaag"></span>' : ''}</td>
+                    <td class="td-dag"><i class="chevron" id="ch-${key}"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg></i>${DAYS[dow]}${isToday ? '<span class="today-dot" title="Vandaag"></span>' : ''}</td>
                     <td class="td-datum">
                         <span class="date-main">${displayDate(d)}</span>
                         <span class="time-sub">${timeHtml}</span>
@@ -1004,6 +1242,10 @@
             }
         }
 
+        function isStandalone() {
+            return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+        }
+
         function process(text) {
             if (!text.includes('BEGIN:VCALENDAR')) {
                 showAlert('Dit lijkt geen geldig ICS bestand te zijn.');
@@ -1017,6 +1259,7 @@
             weekStart = mondayOf(new Date());
             renderWeek();
             document.getElementById('onboardingSteps').style.display = 'none';
+            document.getElementById('installGuideCard').style.display = isStandalone() ? 'none' : '';
         }
 
         function clearSaved() {
@@ -1025,6 +1268,7 @@
             document.getElementById('clearBtn').style.display = 'none';
             document.getElementById('resultsCard').style.display = 'none';
             document.getElementById('onboardingSteps').style.display = '';
+            document.getElementById('installGuideCard').style.display = 'none';
             clearTimeout(loadBtnTimeout);
             const btn = document.getElementById('loadBtn');
             btn.classList.remove('btn-loaded');

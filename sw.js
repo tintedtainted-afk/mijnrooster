@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mijn-rooster-v12';
+const CACHE_NAME = 'mijn-rooster-v18';
 const APP_SHELL = [
     './',
     './index.html',
@@ -6,7 +6,9 @@ const APP_SHELL = [
     './icon.png',
     './apple-touch-icon.png',
     './icon-192.png',
-    './icon-512.png'
+    './icon-512.png',
+    './icon-192-maskable.png',
+    './icon-512-maskable.png'
 ];
 
 self.addEventListener('install', (event) => {
