@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mijn-rooster-v18';
+const CACHE_NAME = 'mijn-rooster-v19';
 const APP_SHELL = [
     './',
     './index.html',
