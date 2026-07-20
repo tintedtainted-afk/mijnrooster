@@ -403,14 +403,14 @@
         }
 
         .event-block.unpaid {
-            background: #f3f4f6;
+            background: #F1EEF9;
         }
 
         .unpaid-badge {
             font-size: 10px;
             font-weight: 600;
-            color: #9ca3af;
-            background: #e5e7eb;
+            color: #7C6BA8;
+            background: #E4DEF5;
             padding: 2px 6px;
             border-radius: 4px;
             white-space: nowrap;
@@ -523,6 +523,7 @@
     <script>
         const HIDDEN  = new Set([]);
         const UNPAID  = new Set(['Lunch', 'Afschalen_FO', 'Ziek', 'Te laat']);
+        const MUTED_STYLE = new Set(['Pauze']); // krijgt dezelfde kleur als onbetaald, maar telt wel mee als betaalde tijd
         const DAYS = ['Zondag', 'Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag'];
         const MONTHS = ['jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
 
@@ -773,7 +774,7 @@
                 let blocksHtml = '';
                 if (dayEvs.length > 0) {
                     blocksHtml = dayEvs.map(ev => `
-                        <div class="event-block${ev.paid ? '' : ' unpaid'}">
+                        <div class="event-block${(!ev.paid || MUTED_STYLE.has(ev.summary)) ? ' unpaid' : ''}">
                             <div class="event-left">
                                 <span class="event-name">${ev.summary}</span>
                                 <span class="event-time">${fmtTime(ev.start)} – ${fmtTime(ev.end)}</span>
