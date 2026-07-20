@@ -1280,6 +1280,20 @@
             return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
         }
 
+        function updateInstallButtonVisibility() {
+            const btn = document.getElementById('installGuideBtn');
+            if (!btn) return;
+            // Alleen tonen als het rooster al geladen is én de app nog niet geïnstalleerd/standalone draait.
+            const hasData = events.length > 0;
+            btn.style.display = (hasData && !isStandalone()) ? '' : 'none';
+        }
+
+        window.matchMedia('(display-mode: standalone)').addEventListener('change', updateInstallButtonVisibility);
+        window.addEventListener('appinstalled', () => {
+            closeInstallModal();
+            updateInstallButtonVisibility();
+        });
+
         function process(text) {
             if (!text.includes('BEGIN:VCALENDAR')) {
                 showAlert('Dit lijkt geen geldig ICS bestand te zijn.');
@@ -1293,7 +1307,7 @@
             weekStart = mondayOf(new Date());
             renderWeek();
             document.getElementById('onboardingSteps').style.display = 'none';
-            document.getElementById('installGuideBtn').style.display = isStandalone() ? 'none' : '';
+            updateInstallButtonVisibility();
         }
 
         function clearSaved() {
