@@ -86,6 +86,28 @@
             transition: background 0.15s;
         }
 
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            background: #f3f4f6;
+            color: #374151;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.15s;
+            flex-shrink: 0;
+        }
+
         .card {
             background: #fff;
             border: 1px solid #efefed;
@@ -152,21 +174,35 @@
             margin-left: 2px;
         }
 
-        .install-guide-header {
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(17, 24, 39, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 1000;
+        }
+
+        .modal-card {
+            background: #fff;
+            border-radius: 20px;
+            max-width: 480px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 22px;
+        }
+
+        .modal-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            cursor: pointer;
+            margin-bottom: 4px;
         }
 
-        .install-guide-content {
-            overflow: hidden;
-            max-height: 0;
-            transition: max-height 0.3s ease;
-        }
-
-        .install-guide-inner {
-            padding-top: 12px;
+        .modal-body {
             display: flex;
             flex-direction: column;
         }
@@ -549,6 +585,7 @@
             .btn:hover { background: #000; }
             .btn-loaded:hover { background: #15803D; }
             .btn-ghost:hover { background: #e5e7eb; }
+            .icon-btn:hover { background: #e5e7eb; }
             .btn-nav:hover { background: #f3f4f6; border-color: #d1d5db; }
             .day-row:hover td { background: #f6f6f5; }
             .day-row.today:hover td { background: var(--accent-tint-hover); }
@@ -569,7 +606,16 @@
                 <img src="icon.png" alt="" class="brand-icon">
                 <h1>Mijn Rooster</h1>
             </div>
-            <button class="btn-today" id="todayBtn" onclick="goToToday()" style="display:none">Naar vandaag</button>
+            <div class="header-actions">
+                <button class="btn-today" id="todayBtn" onclick="goToToday()" style="display:none">Naar vandaag</button>
+                <button class="icon-btn" id="installGuideBtn" onclick="openInstallModal()" style="display:none" title="Installeren als app">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 3v12"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <path d="M5 19h14"/>
+                    </svg>
+                </button>
+            </div>
         </div>
 
         <div class="card">
@@ -624,13 +670,18 @@
             </div>
         </div>
 
-        <div class="card" id="installGuideCard" style="display:none">
-            <div class="install-guide-header" onclick="toggleInstallGuide()">
-                <span class="field-label" style="margin-bottom:0">Installeren als app</span>
-                <i class="chevron" id="installChevron"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg></i>
-            </div>
-            <div class="install-guide-content" id="installGuideContent">
-                <div class="install-guide-inner">
+        <div class="modal-backdrop" id="installModalBackdrop" style="display:none" onclick="closeInstallModal(event)">
+            <div class="modal-card" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <span class="field-label" style="margin-bottom:0">Installeren als app</span>
+                    <button class="icon-btn" onclick="closeInstallModal()" title="Sluiten">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"/>
+                            <line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="modal-body">
 
                     <div class="platform-block">
                         <div class="platform-header" onclick="togglePlatform('chrome-desktop')">
@@ -934,35 +985,17 @@
             }
         }
 
-        function toggleInstallGuide() {
-            const content = document.getElementById('installGuideContent');
-            const chevron = document.getElementById('installChevron');
-            const isOpen = content.classList.contains('open');
-
-            if (isOpen) {
-                // Eerst een concrete hoogte zetten (kan niet animeren vanaf 'none'), dan pas dichtklappen.
-                content.style.maxHeight = content.scrollHeight + 'px';
-                void content.offsetHeight; // forceer reflow
-                content.style.maxHeight = '0px';
-                content.classList.remove('open');
-                chevron.classList.remove('open');
-            } else {
-                content.classList.add('open');
-                chevron.classList.add('open');
-                content.style.maxHeight = content.scrollHeight + 'px';
-
-                content.addEventListener('transitionend', function handler(e) {
-                    if (e.propertyName === 'max-height') {
-                        // Geen hoogtelimiet meer zodra open: geneste accordions kunnen dan nooit
-                        // meer afgesneden worden, ongeacht hoe hoog hun inhoud wordt.
-                        if (content.classList.contains('open')) {
-                            content.style.maxHeight = 'none';
-                        }
-                        content.removeEventListener('transitionend', handler);
-                    }
-                });
-            }
+        function openInstallModal() {
+            document.getElementById('installModalBackdrop').style.display = 'flex';
         }
+
+        function closeInstallModal(e) {
+            document.getElementById('installModalBackdrop').style.display = 'none';
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeInstallModal();
+        });
 
         function togglePlatform(id) {
             const content = document.getElementById(`pc-${id}`);
@@ -1260,7 +1293,7 @@
             weekStart = mondayOf(new Date());
             renderWeek();
             document.getElementById('onboardingSteps').style.display = 'none';
-            document.getElementById('installGuideCard').style.display = isStandalone() ? 'none' : '';
+            document.getElementById('installGuideBtn').style.display = isStandalone() ? 'none' : '';
         }
 
         function clearSaved() {
@@ -1269,7 +1302,8 @@
             document.getElementById('clearBtn').style.display = 'none';
             document.getElementById('resultsCard').style.display = 'none';
             document.getElementById('onboardingSteps').style.display = '';
-            document.getElementById('installGuideCard').style.display = 'none';
+            document.getElementById('installGuideBtn').style.display = 'none';
+            closeInstallModal();
             clearTimeout(loadBtnTimeout);
             const btn = document.getElementById('loadBtn');
             btn.classList.remove('btn-loaded');
