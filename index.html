@@ -155,6 +155,10 @@
         input[type="url"]:focus { border-color: var(--accent); }
 
         .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
             padding: 10px 18px;
             background: var(--ink);
             color: #fff;
@@ -168,6 +172,27 @@
         }
 
         .btn:disabled { background: #9ca3af; cursor: not-allowed; }
+
+        .btn-loaded { background: #16A34A; }
+
+        .icon-swap {
+            position: relative;
+            display: inline-flex;
+            width: 14px;
+            height: 14px;
+        }
+
+        .swap-icon {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.35s ease;
+        }
+
+        .swap-icon.visible { opacity: 1; }
 
         .btn-ghost {
             background: #f3f4f6;
@@ -385,9 +410,18 @@
         .event-left { display: flex; flex-direction: column; gap: 2px; }
 
         .event-name {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
             font-weight: 600;
             font-size: 13px;
             color: #374151;
+        }
+
+        .event-name .break-icon {
+            display: inline-flex;
+            color: #7C6BA8;
+            flex-shrink: 0;
         }
 
         .event-time {
@@ -443,6 +477,7 @@
         @media (hover: hover) and (pointer: fine) {
             .btn-today:hover { background: var(--accent-tint-hover); }
             .btn:hover { background: #000; }
+            .btn-loaded:hover { background: #15803D; }
             .btn-ghost:hover { background: #e5e7eb; }
             .btn-nav:hover { background: #f3f4f6; border-color: #d1d5db; }
             .day-row:hover td { background: #f6f6f5; }
@@ -524,11 +559,13 @@
         const HIDDEN  = new Set([]);
         const UNPAID  = new Set(['Lunch', 'Afschalen_FO', 'Ziek', 'Te laat']);
         const MUTED_STYLE = new Set(['Pauze']); // krijgt dezelfde kleur als onbetaald, maar telt wel mee als betaalde tijd
+        const BREAK_ICON = new Set(['Lunch', 'Pauze']);
         const DAYS = ['Zondag', 'Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag'];
         const MONTHS = ['jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
 
         let events = [];
         let weekStart = mondayOf(new Date());
+        let loadBtnTimeout = null;
 
         // --- Datum hulpfuncties ---
 
@@ -670,6 +707,26 @@
             </svg>`;
         }
 
+        function refreshIcon() {
+            return `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12a9 9 0 1 1-2.64-6.36"/>
+                <polyline points="21 3 21 9 15 9"/>
+            </svg>`;
+        }
+
+        function checkIcon() {
+            return `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+            </svg>`;
+        }
+
+        function clockIcon() {
+            return `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="9"/>
+                <polyline points="12 7 12 12 15.5 14"/>
+            </svg>`;
+        }
+
         // --- Accordeon ---
 
         function toggleAccordion(key) {
@@ -776,7 +833,7 @@
                     blocksHtml = dayEvs.map(ev => `
                         <div class="event-block${(!ev.paid || MUTED_STYLE.has(ev.summary)) ? ' unpaid' : ''}">
                             <div class="event-left">
-                                <span class="event-name">${ev.summary}</span>
+                                <span class="event-name">${BREAK_ICON.has(ev.summary) ? `<span class="break-icon">${clockIcon()}</span>` : ''}${ev.summary}</span>
                                 <span class="event-time">${fmtTime(ev.start)} – ${fmtTime(ev.end)}</span>
                             </div>
                             ${ev.paid
@@ -908,7 +965,9 @@
 
             hideAlert();
             const btn = document.getElementById('loadBtn');
+            clearTimeout(loadBtnTimeout);
             btn.disabled = true;
+            btn.classList.remove('btn-loaded');
             btn.textContent = 'Laden…';
 
             try {
@@ -918,15 +977,30 @@
                 localStorage.setItem('werkuren_ics_url', url);
                 document.getElementById('clearBtn').style.display = '';
                 process(text);
+
+                if (events.length > 0) {
+                    btn.classList.add('btn-loaded');
+                    btn.innerHTML = `<span class="icon-swap">
+                        <span class="swap-icon visible">${checkIcon()}</span>
+                        <span class="swap-icon">${refreshIcon()}</span>
+                    </span>`;
+                    const [checkEl, refreshEl] = btn.querySelectorAll('.swap-icon');
+                    loadBtnTimeout = setTimeout(() => {
+                        checkEl.classList.remove('visible');
+                        refreshEl.classList.add('visible');
+                    }, 1400);
+                } else {
+                    btn.textContent = 'Laden';
+                }
             } catch (err) {
                 const isCors = err instanceof TypeError;
                 showAlert(isCors
                     ? '<strong>URL kon niet worden geladen vanuit de browser.</strong><br>Dit komt door een CORS-beperking van de server. Probeer de pagina te vernieuwen of gebruik een andere browser.'
                     : `Fout bij laden: ${err.message}`
                 );
+                btn.textContent = 'Laden';
             } finally {
                 btn.disabled = false;
-                btn.textContent = 'Laden';
             }
         }
 
@@ -951,6 +1025,10 @@
             document.getElementById('clearBtn').style.display = 'none';
             document.getElementById('resultsCard').style.display = 'none';
             document.getElementById('onboardingSteps').style.display = '';
+            clearTimeout(loadBtnTimeout);
+            const btn = document.getElementById('loadBtn');
+            btn.classList.remove('btn-loaded');
+            btn.textContent = 'Laden';
             hideAlert();
             events = [];
         }
