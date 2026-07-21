@@ -807,6 +807,8 @@
         let events = [];
         let weekStart = mondayOf(new Date());
         let loadBtnTimeout = null;
+        let openDayKey = null;
+        let refreshInterval = null;
 
         // --- Datum hulpfuncties ---
 
@@ -983,6 +985,9 @@
             if (!isOpen) {
                 content.classList.add('open');
                 if (chevron) chevron.classList.add('open');
+                openDayKey = key;
+            } else {
+                openDayKey = null;
             }
         }
 
@@ -1133,6 +1138,18 @@
 
             document.getElementById('weekTotal').textContent = msToHours(weekMs);
             document.getElementById('resultsCard').style.display = 'block';
+
+            // Herstel de opengeklapte dag na een ververs, als die nog in de huidige week zit.
+            if (openDayKey) {
+                const openContent = document.getElementById(`ac-${openDayKey}`);
+                const openChevron = document.getElementById(`ch-${openDayKey}`);
+                if (openContent) {
+                    openContent.classList.add('open');
+                    if (openChevron) openChevron.classList.add('open');
+                } else {
+                    openDayKey = null;
+                }
+            }
         }
 
         function changeWeek(dir) {
@@ -1309,7 +1326,49 @@
             renderWeek();
             document.getElementById('onboardingSteps').style.display = 'none';
             updateInstallButtonVisibility();
+            startAutoRefresh();
         }
+
+        // --- Automatisch verversen ---
+
+        async function silentRefresh() {
+            const url = document.getElementById('icsUrl').value.trim();
+            if (!url) return;
+
+            try {
+                const res = await fetch(url);
+                if (!res.ok) return; // stil falen; laatst bekende data blijft gewoon staan
+
+                const text = await res.text();
+                if (!text.includes('BEGIN:VCALENDAR')) return;
+
+                const newEvents = parseICS(text);
+                if (newEvents.length === 0) return;
+
+                events = newEvents;
+                renderWeek();
+            } catch (err) {
+                // Netwerkfout tijdens stille ververs: negeren, gewoon opnieuw proberen bij de volgende cyclus.
+            }
+        }
+
+        function startAutoRefresh() {
+            stopAutoRefresh();
+            refreshInterval = setInterval(silentRefresh, 15 * 60 * 1000);
+        }
+
+        function stopAutoRefresh() {
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+                refreshInterval = null;
+            }
+        }
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible' && events.length > 0) {
+                silentRefresh();
+            }
+        });
 
         function clearSaved() {
             localStorage.removeItem('werkuren_ics_url');
@@ -1320,11 +1379,13 @@
             document.getElementById('installGuideBtn').style.display = 'none';
             closeInstallModal();
             clearTimeout(loadBtnTimeout);
+            stopAutoRefresh();
             const btn = document.getElementById('loadBtn');
             btn.classList.remove('btn-loaded');
             btn.textContent = 'Importeren';
             hideAlert();
             events = [];
+            openDayKey = null;
         }
 
         window.addEventListener('load', () => {
