@@ -797,9 +797,10 @@
 
     <script>
         const HIDDEN  = new Set([]);
-        const UNPAID  = new Set(['Lunch', 'Afschalen_FO', 'Ziek', 'Te laat']);
+        const UNPAID  = new Set(['Lunch', 'Afschalen_FO', 'Ziek', 'Te laat', 'Niet beschikbaar']);
         const MUTED_STYLE = new Set(['Pauze']); // krijgt dezelfde kleur als onbetaald, maar telt wel mee als betaalde tijd
         const BREAK_ICON = new Set(['Lunch', 'Pauze']);
+        const NO_HOURS_LABEL = new Set(['Niet beschikbaar']); // onbetaald, maar geen "Onbetaald"-label tonen
         const DAYS = ['Zondag', 'Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag'];
         const MONTHS = ['jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
 
@@ -1110,7 +1111,7 @@
                             </div>
                             ${ev.paid
                                 ? `<span class="event-dur">${fmtHours(ev.durationMs)} u</span>`
-                                : `<span class="unpaid-badge">Onbetaald</span>`
+                                : (NO_HOURS_LABEL.has(ev.summary) ? '' : `<span class="unpaid-badge">Onbetaald</span>`)
                             }
                         </div>
                     `).join('');
